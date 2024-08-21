@@ -1,0 +1,36 @@
+name: Build
+
+on:
+  push:
+    branches: [ "master" ]
+    paths-ignore:
+      - '**/README.md'
+      - '.github/**'
+  workflow_dispatch:
+
+jobs:
+
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+      
+    - name: Restore the application
+      run: nuget restore
+      
+    - name: Build the application
+      run: dotnet publish /t:JPKGReader /p:Configuration=Release
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: net8.0
+        path: JPKGReader/bin/Release/net8.0/publish
