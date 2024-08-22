@@ -2,6 +2,15 @@
 
 public class Program
 {
+    private static List<Func<Stream, JPKG>> _versions;
+    static Program()
+    {
+        _versions = [
+            stream => new JPKGV1(stream),
+            stream => new JPKGV3(stream),
+            stream => new JPKGV4(stream)
+        ];
+    }
     public static void Main(string[] args)
     {
         if (args.Length != 1)
@@ -19,26 +28,19 @@ public class Program
         JPKG pkg;
         using var fs = File.OpenRead(args[0]);
 
-        try
+        foreach (var version in _versions)
         {
-            pkg = new JPKGV1(fs);
-            pkg.Parse();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error while parsing jPKG v1, {ex}");
-        }
+            try
+            {
+                pkg = version(fs);
+                pkg.Parse();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error while parsing {nameof(pkg)}, {ex}");
+            }
 
-        fs.Position = 0;
-
-        try
-        {
-            pkg = new JPKG3(fs);
-            pkg.Parse();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error while parsing jPKG v3, {ex}");
+            fs.Position = 0;
         }
     }
 }

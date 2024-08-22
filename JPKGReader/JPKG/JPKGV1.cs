@@ -5,8 +5,18 @@ using System.Text;
 namespace JPKGReader;
 public class JPKGV1 : JPKG
 {
+    private const int MaxBlockSize = 0x40000;
+
+    public int FilesCount { get; set; }
+    public int BlocksCount { get; set; }
+    public int FilesSize { get; set; }
+    public int BlocksSize { get; set; }
+    public int DataOffset { get; set; }
+    public long Version { get; set; }
+    public long Size { get; set; }
     public List<Node> Files { get; set; } = [];
     public List<Entry> Blocks { get; set; } = [];
+
     public JPKGV1(Stream stream) : base(stream) { }
 
     public override void Parse()
@@ -118,22 +128,7 @@ public class JPKGV1 : JPKG
             reader.BaseStream.Position = file.Offset;
             byte[] data = reader.ReadBytes((int)file.Size);
 
-            var fileName = $"{file.ID:X8}." + Encoding.UTF8.GetString(data[..4]) switch
-            {
-                "OggS" => "ogg",
-                "jTOC" => "jtoc",
-                "jARC" => "jarc",
-                "jLUA" => "jlua",
-                "jlev" => "jlev",
-                "jpfb" => "jpfb",
-                "jMSG" => "jmsg",
-                "coli" => "coli",
-                "soli" => "soli",
-                "jtex" => "jtex",
-                "jmo2" => "jmo2",
-                "OTTO" => "otto",
-                _ => "dat"
-            };
+            var fileName = $"{file.ID:X8}." + (Extensions.TryGetValue(Encoding.UTF8.GetString(data[..4]), out var extension) ? extension : "dat");
 
             Console.WriteLine($"Writing {fileName}");
             File.WriteAllBytes($"output/{fileName}", data);

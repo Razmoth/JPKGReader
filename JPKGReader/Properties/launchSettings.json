@@ -2,7 +2,7 @@
   "profiles": {
     "JPKGReader": {
       "commandName": "Project",
-      "commandLineArgs": "\"C:\\Users\\Razmoth\\Desktop\\Programs\\quickbms\\Scripts\\main.34.jp.co.ganbarion.endan.obb\""
+      "commandLineArgs": "\"C:\\Users\\Razmoth\\Downloads\\download.jpkg\""
     }
   }
 }

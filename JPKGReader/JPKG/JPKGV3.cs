@@ -3,13 +3,22 @@ using System.Buffers;
 using System.Text;
 
 namespace JPKGReader;
-public class JPKG3 : JPKG
+public class JPKGV3 : JPKG
 {
+    private const int MaxBlockSize = 0x40000;
     private const uint Seed = 0x9A44EDF5;
 
+    public int FilesCount { get; set; }
+    public int BlocksCount { get; set; }
+    public int FilesSize { get; set; }
+    public int BlocksSize { get; set; }
+    public int DataOffset { get; set; }
+    public long Version { get; set; }
+    public long Size { get; set; }
     public List<Node> Files { get; set; } = [];
     public List<Entry> Blocks { get; set; } = [];
-    public JPKG3(Stream stream) : base(stream) { }
+
+    public JPKGV3(Stream stream) : base(stream) { }
 
     public override void Parse()
     {
@@ -48,7 +57,7 @@ public class JPKG3 : JPKG
         FilesSize = reader.ReadInt32();
         BlocksSize = reader.ReadInt32();
         DataOffset = reader.ReadInt32();
-        var num1 = reader.ReadInt32();
+        var num2 = reader.ReadInt32();
         Size = reader.ReadInt64();
 
         if (Version != 3)
@@ -132,22 +141,7 @@ public class JPKG3 : JPKG
             reader.BaseStream.Position = file.Offset;
             byte[] data = reader.ReadBytes((int)file.Size);
 
-            var fileName = $"{file.ID:X8}." + Encoding.UTF8.GetString(data[..4]) switch
-            {
-                "OggS" => "ogg",
-                "jTOC" => "jtoc",
-                "jARC" => "jarc",
-                "jLUA" => "jlua",
-                "jlev" => "jlev",
-                "jpfb" => "jpfb",
-                "jMSG" => "jmsg",
-                "coli" => "coli",
-                "soli" => "soli",
-                "jtex" => "jtex",
-                "jmo2" => "jmo2",
-                "OTTO" => "otto",
-                _ => "dat"
-            };
+            var fileName = $"{file.ID:X8}." + (Extensions.TryGetValue(Encoding.UTF8.GetString(data[..4]), out var extension) ? extension : "dat");
 
             Console.WriteLine($"Writing {fileName}");
             File.WriteAllBytes($"output/{fileName}", data);

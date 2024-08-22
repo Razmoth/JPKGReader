@@ -3,19 +3,37 @@
 namespace JPKGReader;
 public abstract class JPKG : IDisposable
 {
-    protected const int MaxBlockSize = 0x40000;
-
     private readonly BinaryReader _reader;
-
-    public int FilesCount { get; set; }
-    public int BlocksCount { get; set; }
-    public int FilesSize { get; set; }
-    public int BlocksSize { get; set; }
-    public int DataOffset { get; set; }
-    public long Version { get; set; }
-    public long Size { get; set; }
+    private readonly Dictionary<string, string> _extensions = new()
+    {
+        ["OggS"] = "ogg",
+        ["jTOC"] = "jtoc",
+        ["jARC"] = "jarc",
+        ["jLUA"] = "jlua",
+        ["jlev"] = "jlev",
+        ["jpfb"] = "jpfb",
+        ["jMSG"] = "jmsg",
+        ["coli"] = "coli",
+        ["soli"] = "soli",
+        ["jtex"] = "jtex",
+        ["jmo2"] = "jmo2",
+        ["OTTO"] = "otto",
+        ["jSHD"] = "jshd",
+        ["jprj"] = "jprj",
+        ["BKHD"] = "bnk",
+        ["jIDT"] = "jidt",
+        ["jTXS"] = "jtxs",
+        ["jSDF"] = "jsdf",
+        ["jfxc"] = "jfxc",
+        ["jvfx"] = "jvfx",
+        ["mesh"] = "mesh",
+        ["skel"] = "skel",
+        ["jSWD"] = "jswd",
+        ["jSCR"] = "jscr"
+    };
 
     public BinaryReader Reader => _reader;
+    public Dictionary<string, string> Extensions => _extensions;
 
     public JPKG(Stream stream) => _reader = new BinaryReader(stream, Encoding.UTF8, true);
 
