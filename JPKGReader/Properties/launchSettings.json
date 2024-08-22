@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "JPKGReader": {
-      "commandName": "Project",
-      "commandLineArgs": "\"C:\\Users\\Razmoth\\Downloads\\download.jpkg\""
-    }
-  }
-}
